@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:api_app/services/api_service.dart';
 import 'package:api_app/models/ipo_model.dart';
+import 'package:api_app/core/routes.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -142,7 +143,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 _buildIcon(Icons.notifications_none),
                 const SizedBox(width: 10),
-                _buildIcon(Icons.settings_outlined),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.setting);
+                  },
+                  child: _buildIcon(Icons.settings_outlined),
+                ),
               ],
             ),
           ],
