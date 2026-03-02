@@ -141,7 +141,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             /// Icons
             Row(
               children: [
-                _buildIcon(Icons.notifications_none),
+                GestureDetector(
+                  onTap: (){
+                    Navigator.pushNamed(context, AppRoutes.notification);
+                  },
+                  child:_buildIcon(Icons.notifications_none),
+                ),
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
