@@ -1,55 +1,56 @@
 class IPOItem {
   final int id;
   final String name;
-  final String bidName;
   final String date;
   final String price;
-  final String logo;
-  final String status;
-  final String issueSize;
-  final String exchange;
-  final String minQty;
   final String lotSize;
-  final String marketLot;
-  final String openDate;
-  final String closeDate;
-  final String listingDate;
+  final String issueSize;
+  final String status;
+  final String logo;
+
+  final String? bidName;
+  final String? exchange;
+  final String? minQty;
+  final String? marketLot;
+  final String? openDate;
+  final String? closeDate;
+  final String? listingDate;
 
   IPOItem({
     required this.id,
     required this.name,
-    required this.bidName,
+    this.bidName,
     required this.date,
     required this.price,
     required this.logo,
     required this.status,
     required this.issueSize,
-    required this.exchange,
-    required this.minQty,
+    this.exchange,
+    this.minQty,
     required this.lotSize,
-    required this.marketLot,
-    required this.openDate,
-    required this.closeDate,
-    required this.listingDate,
+    this.marketLot,
+    this.openDate,
+    this.closeDate,
+    this.listingDate,
   });
 
   factory IPOItem.fromJson(Map<String, dynamic> json) {
     return IPOItem(
       id: json["IPOSitesId"] ?? 0,
-      name: json["IPOName"] ?? "",
-      bidName: json["IPOBidName"] ?? "",
-      date: json["Date"] ?? "",
-      price: json["PriceRange"] ?? "",
-      logo: json["LogoURL"] ?? "",
-      status: json["IPOStatus"] ?? "",
-      issueSize: json["IssueSize"] ?? "",
-      exchange: json["Exchange"] ?? "",
-      minQty: json["MinQty"] ?? "",
-      lotSize: json["LotSize"] ?? "",
-      marketLot: json["MarketLot"] ?? "",
-      openDate: json["OpenDate"] ?? "",
-      closeDate: json["CloseDate"] ?? "",
-      listingDate: json["ListingDate"] ?? "",
+      name: json["IPOName"]?.toString() ?? "",
+      bidName: json["IPOBidName"]?.toString() ?? "",
+      date: json["Date"]?.toString() ?? "",
+      price: json["PriceRange"]?.toString() ?? "",
+      logo: json["LogoURL"]?.toString() ?? "",
+      status: json["IPOStatus"]?.toString() ?? "",
+      issueSize: json["IssueSize"]?.toString() ?? "",
+      exchange: json["Exchange"]?.toString() ?? "",
+      minQty: json["MinQty"]?.toString() ?? "",
+      lotSize: json["LotSize"]?.toString() ?? "",
+      marketLot: json["MarketLot"]?.toString() ?? "",
+      openDate: json["OpenDate"]?.toString() ?? "",
+      closeDate: json["CloseDate"]?.toString() ?? "",
+      listingDate: json["ListingDate"]?.toString() ?? "",
     );
   }
 

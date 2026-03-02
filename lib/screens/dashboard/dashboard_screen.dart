@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:api_app/services/api_service.dart';
+// import 'package:api_app/services/api_service.dart';
 import 'package:api_app/models/ipo_model.dart';
 import 'package:api_app/core/routes.dart';
+import 'package:api_app/screens/profile_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -9,8 +10,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  // ✅ Bottom Navigation Index
+  int _bottomIndex = 0;
+
+  // ✅ IPO Tab Variables
   bool sortAscending = true;
   int selectedTab = 1;
+
+  // ---------------- IPO UI ---------------- //
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
@@ -23,26 +30,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       default:
         return Colors.blueGrey;
     }
-  }
-
-  Widget _buildBoardBadge(String title) {
-    return Container(
-      padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
-      child: Row(
-        children: [
-          const Icon(Icons.check, size: 24, color: Color(0xFF00338B)),
-          const SizedBox(width: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: Colors.grey.shade500,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildInfoBlock(String title, String value) {
@@ -60,6 +47,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildBoardBadge(String title) {
+    return Container(
+      padding: const EdgeInsets.only(top: 7, bottom: 7, left: 10),
+      child: Row(
+        children: [
+          const Icon(Icons.check, size: 24, color: Color(0xFF00338B)),
+          const SizedBox(width: 4),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -108,7 +115,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected ? Colors.white : const Color.fromARGB(221, 100, 100, 100),
+              fontSize: 18,
+              color: isSelected
+                  ? Colors.white
+                  : const Color.fromARGB(221, 100, 100, 100),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -117,36 +127,255 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // --- Added Nav Item Builder inside State class ---
-  Widget _buildNavItem(IconData icon, String label, bool isSelected) {
-    final color = isSelected ? const Color(0xFF00338B) : Colors.grey;
+  Widget _buildIPOScreen() {
+    final List<IPOItem> ipoList = [
+      IPOItem(
+        id: 1,
+        name: "Tata Technologies",
+        date: "15 - 18 Dec 2025",
+        price: "₹450 - ₹500",
+        lotSize: "30",
+        issueSize: "₹1200 Cr",
+        status: "Open",
+        logo: "",
+      ),
+      IPOItem(
+        id: 2,
+        name: "Reliance Retail",
+        date: "20 - 23 Dec 2025",
+        price: "₹900 - ₹950",
+        lotSize: "15",
+        issueSize: "₹5000 Cr",
+        status: "Upcoming",
+        logo: "",
+      ),
+      IPOItem(
+        id: 3,
+        name: "OYO Rooms",
+        date: "10 - 12 Dec 2025",
+        price: "₹300 - ₹350",
+        lotSize: "40",
+        issueSize: "₹800 Cr",
+        status: "Closed",
+        logo: "",
+      ),
+    ];
+
+    // FutureBuilder<List<IPOItem>>(
+    // future: ApiService.fetchIPOItems(),
+    // builder: (context, snapshot) {
+    //   if (snapshot.connectionState == ConnectionState.waiting) {
+    //     return const Center(child: CircularProgressIndicator());
+    //   }
+
+    //   if (snapshot.hasError) {
+    //     return Center(child: Text("Error: ${snapshot.error}"));
+    //   }
+
+    //   if (!snapshot.hasData) {
+    //     return const Center(child: Text("No Data"));
+    //   }
+
+    //   var ipoList = snapshot.data!;
+
+    var filteredList = ipoList.where((item) {
+      final status = item.status.toLowerCase().trim();
+      if (selectedTab == 0) return status == "open";
+      if (selectedTab == 1) return status == "upcoming";
+      return status == "closed";
+    }).toList();
+
+    filteredList.sort((a, b) {
+      return sortAscending
+          ? a.name.compareTo(b.name)
+          : b.name.compareTo(a.name);
+    });
+
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
+        // Top Tabs
+        _buildTopTabs(),
         Container(
-          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF00338B) : Colors.transparent,
-            shape: BoxShape.circle,
+            color: Colors.grey.shade200,
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
           ),
-          child: Icon(
-            icon,
-            color: isSelected ? Colors.white : Colors.grey,
-            size: 26,
+          padding: const EdgeInsets.only(top: 7, bottom: 7, right: 10),
+          child: Row(
+            children: [
+              _buildBoardBadge("MAINBOARD"),
+              const SizedBox(width: 10),
+              _buildBoardBadge("SME"),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => setState(() => sortAscending = !sortAscending),
+                child: Row(
+                  children: [
+                    Text(
+                      "Sort",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Icon(
+                      Icons.swap_vert,
+                      size: 24,
+                      color: Colors.grey.shade500,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontSize: 11,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 1,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.35, // Adjusted to fit with the new bottom bar
+            ),
+            itemCount: filteredList.length,
+            itemBuilder: (context, index) {
+              final item = filteredList[index];
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              "https://jainam-uat.ipoplus.in/Images/${item.logo}",
+                              height: 55,
+                              width: 55,
+                              fit: BoxFit.cover,
+                              errorBuilder: (c, e, s) => Image.asset(
+                                "assets/images/Meesho_logo.png",
+                                height: 55,
+                                width: 55,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _getStatusColor(item.status),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              item.status,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      const Divider(thickness: 1),
+                      const SizedBox(height: 5),
+                      Text(
+                        item.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF003E70),
+                        ),
+                      ),
+                      Text(
+                        item.date,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      const Divider(thickness: 1),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoBlock("Price Range", item.price),
+                          _buildInfoBlock("Lot Size", item.lotSize),
+                          _buildInfoBlock("Issue Size", item.issueSize),
+                        ],
+                      ),
+
+                      // SizedBox(height: 5),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF00338B),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                "Apply",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {},
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text("View Details"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
     );
   }
+
+  // ---------------- UI ---------------- //
 
   @override
   Widget build(BuildContext context) {
@@ -162,10 +391,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               children: [
                 GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     Navigator.pushNamed(context, AppRoutes.notification);
                   },
-                  child:_buildIcon(Icons.notifications_none),
+                  child: _buildIcon(Icons.notifications_none),
                 ),
                 const SizedBox(width: 10),
                 GestureDetector(
@@ -180,171 +409,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       backgroundColor: Colors.grey.shade200,
-      body: FutureBuilder<List<IPOItem>>(
-        future: ApiService.fetchIPOItems(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text("Error:\n${snapshot.error}", textAlign: TextAlign.center));
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text("No Data"));
-          }
 
-          var ipoList = snapshot.data!;
-          var filteredList = ipoList.where((item) {
-            final status = item.status.toLowerCase().trim();
-            if (selectedTab == 0) return status == "open";
-            if (selectedTab == 1) return status == "upcoming";
-            return status == "closed";
-          }).toList();
-
-          filteredList.sort((a, b) {
-            return sortAscending ? a.name.compareTo(b.name) : b.name.compareTo(a.name);
-          });
-
-          return Column(
-            children: [
-              _buildTopTabs(),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-                ),
-                padding: const EdgeInsets.only(top: 7, bottom: 7, right: 10),
-                child: Row(
-                  children: [
-                    _buildBoardBadge("MAINBOARD"),
-                    const SizedBox(width: 10),
-                    _buildBoardBadge("SME"),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () => setState(() => sortAscending = !sortAscending),
-                      child: Row(
-                        children: [
-                          Text("Sort", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.grey.shade500)),
-                          const SizedBox(width: 5),
-                          Icon(Icons.swap_vert, size: 24, color: Colors.grey.shade500),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.1, // Adjusted to fit with the new bottom bar
-                  ),
-                  itemCount: filteredList.length,
-                  itemBuilder: (context, index) {
-                    final item = filteredList[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4)),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    "https://jainam-uat.ipoplus.in/Images/${item.logo}",
-                                    height: 55, width: 55, fit: BoxFit.cover,
-                                    errorBuilder: (c, e, s) => Image.asset("assets/images/Meesho_logo.png", height: 55, width: 55),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: _getStatusColor(item.status),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(item.status, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            const Divider(thickness: 1),
-                            const SizedBox(height: 10),
-                            Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF003E70))),
-                            Text(item.date, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                            const SizedBox(height: 10),
-                            const Divider(thickness: 1),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _buildInfoBlock("Price Range", item.price),
-                                _buildInfoBlock("Lot Size", item.lotSize),
-                                _buildInfoBlock("Issue Size", item.issueSize),
-                              ],
-                            ),
-                            const Spacer(),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00338B), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                    child: const Text("Apply", style: TextStyle(color: Colors.white)),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () {},
-                                    style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                    child: const Text("View Details"),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
+      body: IndexedStack(
+        index: _bottomIndex,
+        children: [
+          _buildIPOScreen(), // ✅ now rebuilds properly
+          const Center(child: Text("Unlisted Screen")),
+          const ProfileScreen(),
+          const Center(child: Text("Order Book Screen")),
+          const Center(child: Text("Announcement Screen")),
+        ],
       ),
-      // --- Integrated Bottom Navigation Bar ---
-      bottomNavigationBar: Container(
-        height: 85,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-          boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2)),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.flag_outlined, "IPO", true),
-            _buildNavItem(Icons.auto_graph_outlined, "Unlisted", false),
-            _buildNavItem(Icons.person_outline, "Profile", false),
-            _buildNavItem(Icons.assignment_outlined, "Order Book", false),
-            _buildNavItem(Icons.notifications_none_outlined, "Announcement", false),
-          ],
-        ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _bottomIndex,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          setState(() {
+            _bottomIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.flag_outlined),
+            label: "IPO",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.auto_graph_outlined),
+            label: "Unlisted",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: "Profile",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_outlined),
+            label: "Order Book",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_none_outlined),
+            label: "Announcement",
+          ),
+        ],
       ),
     );
   }

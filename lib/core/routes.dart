@@ -4,6 +4,7 @@ import '../screens/auth/login_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/setting_screen.dart';
 import '../screens/notification_screen.dart';
+import '../screens/profile_screen.dart';
 
 class AppRoutes {
   static const String splash = "/";
@@ -11,6 +12,7 @@ class AppRoutes {
   static const String dashboard = "/dashboard";
   static const String setting = "/setting";
   static const String notification = "/notification";
+  static const String profile = "/profile";
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => SplashScreen(),
@@ -18,5 +20,6 @@ class AppRoutes {
     dashboard: (context) => DashboardScreen(),
     setting: (context) => SettingScreen(),
     notification: (context) => const NotificationScreen(),
+    profile:(context) => ProfileScreen(),
   };
 }
